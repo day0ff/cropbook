@@ -1,0 +1,71 @@
+# =========================
+# Dependencies
+# =========================
+node_modules/
+.pnpm-store/
+
+# =========================
+# Build outputs
+# =========================
+dist/
+build/
+out/
+tsconfig.tsbuildinfo
+tsconfig.build.tsbuildinfo
+
+# Vite
+apps/web/dist/
+
+# NestJS
+apps/api/dist/
+
+# Shared package
+packages/**/dist/
+
+# =========================
+# Environment files
+# =========================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# Cache / Temp
+# =========================
+.cache/
+.tmp/
+temp/
+
+# =========================
+# Coverage
+# =========================
+coverage/
+
+# =========================
+# Misc
+# =========================
+*.tgz
+*.pid
+*.seed

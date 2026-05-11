@@ -1,0 +1,23 @@
+{
+  "name": "cropbook",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "clean": "bash ./scripts/clean.sh",
+    "clean-install": "bash ./scripts/clean-install.sh",
+    "ci": "pnpm run clean-install",
+    "build": "pnpm -r build",
+    "build:packages": "pnpm -r --filter '@cropbook/**' build",
+    "debug": "FORCE_COLOR=1 dotenv -e .env -- concurrently --prefix '[{name}]' -n api,web -c green,magenta 'pnpm --filter api start:debug' 'pnpm --filter web dev'",
+    "dev": "FORCE_COLOR=1 dotenv -e .env -- concurrently --prefix '[{name}]' -n api,web -c green,magenta 'pnpm --filter api start:dev' 'pnpm --filter web dev'",
+    "dev:api": "dotenv -e .env -- concurrently --prefix '[{name}]' -n api -c green 'pnpm --filter api start:dev'",
+    "dev:web": "dotenv -e .env -- concurrently --prefix '[{name}]' -n web -c magenta 'pnpm --filter web dev'",
+    "lint": "pnpm -r lint"
+  },
+  "author": "Denis Vershadov",
+  "packageManager": "pnpm@11.0.9",
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "dotenv-cli": "^11.0.0"
+  }
+}

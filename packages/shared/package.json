@@ -1,0 +1,13 @@
+{
+  "name": "@cropbook/shared",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {},
+  "devDependencies": {
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.59.2"
+  }
+}
