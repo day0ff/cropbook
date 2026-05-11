@@ -39,5 +39,19 @@ pnpm install
 
 - `pnpm dev`: Start the development server.
 - `pnpm build`: Build the project for production.
-- `pnpm start`: Run the compiled application.
+- `pnpm lint`: Run lint checking.
 
+
+## How to add new skill for ai instruction
+ - Add any existing github ai skill
+```bash
+npx skills add <<path-to-github-repo>>
+```
+ - NestJS
+```bash
+npx skills add Kadajett/agent-nestjs-skills
+```
+ - React vercel
+```bash
+npx skills add vercel-labs/agent-skills
+```

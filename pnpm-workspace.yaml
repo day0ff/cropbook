@@ -3,4 +3,7 @@ packages:
   - packages/*
 allowBuilds:
   '@nestjs/core': false
+  canvas: true
+  sharp: true
+  tesseract.js: true
   unrs-resolver: false
