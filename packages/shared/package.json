@@ -5,6 +5,11 @@
   "scripts": {
     "build": "tsc"
   },
+  "exports": {
+    "./types": {
+      "types": "./dist/types/index.d.ts"
+    }
+  },
   "peerDependencies": {},
   "devDependencies": {
     "typescript": "~6.0.2",
