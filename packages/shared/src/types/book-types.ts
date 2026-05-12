@@ -12,6 +12,12 @@ export interface BookDetail {
 }
 
 export interface BookSummary {
+  name: string;
+  pages: number;
+}
+
+export interface BookUploadProgress {
   bookName: string;
-  pageCount: number;
+  totalPages: number;
+  currentPage: number;
 }

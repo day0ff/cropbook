@@ -13,7 +13,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { BookDetail, BookSummary } from '@cropbook/shared/types';
+import {
+  BookDetail,
+  BookSummary,
+  BookUploadProgress,
+} from '@cropbook/shared/types';
 import { BooksService } from './books.service';
 
 @Controller('books')
@@ -42,9 +46,11 @@ export class BooksController {
     return this.booksService.listBooks();
   }
 
-  @Get(':bookName')
-  async getBook(@Param('bookName') bookName: string): Promise<BookDetail> {
-    return this.booksService.getBook(bookName);
+  @Get(':bookName/status')
+  async getBookUploadStatus(
+    @Param('bookName') bookName: string,
+  ): Promise<BookUploadProgress | undefined> {
+    return this.booksService.getBookUploadProgress(bookName);
   }
 
   @Get(':bookName/pages/:pageNumber')
@@ -58,5 +64,15 @@ export class BooksController {
       pageNumber,
     );
     res.type('image/png').sendFile(pagePath);
+  }
+
+  @Get(':bookName')
+  async getBook(@Param('bookName') bookName: string): Promise<BookDetail> {
+    return this.booksService.getBook(bookName);
+  }
+
+  @Post(':bookName/abort')
+  async abortBookUpload(@Param('bookName') bookName: string): Promise<void> {
+    return this.booksService.abortUpload(bookName);
   }
 }

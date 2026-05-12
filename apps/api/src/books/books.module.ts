@@ -3,6 +3,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { BooksController } from './books.controller';
 import { BooksService } from './books.service';
+import { BooksDbService } from './books-db.service';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { BooksService } from './books.service';
     }),
   ],
   controllers: [BooksController],
-  providers: [BooksService],
+  providers: [BooksService, BooksDbService],
 })
 export class BooksModule {}

@@ -7,12 +7,20 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { BookPage, BookDetail, BookSummary } from '@cropbook/shared/types';
+import {
+  BookPage,
+  BookDetail,
+  BookSummary,
+  BookUploadProgress,
+} from '@cropbook/shared/types';
+import { BooksDbService } from './books-db.service';
 
 const execFileAsync = promisify(execFile);
 
 @Injectable()
 export class BooksService {
+  constructor(private readonly booksDb: BooksDbService) {}
+
   private get booksRoot(): string {
     return path.resolve(
       process.cwd(),
@@ -36,9 +44,18 @@ export class BooksService {
     await fs.writeFile(inputPath, file.buffer);
 
     const dpi = 300;
+    const totalPages = await this.getPdfPageCount(inputPath).catch(() => 0);
+
+    await this.booksDb.setProgress({
+      bookName: normalizedBookName,
+      totalPages,
+      currentPage: 0,
+    });
+
+    let conversionComplete = false;
 
     try {
-      await execFileAsync('pdftoppm', [
+      const conversionPromise = execFileAsync('pdftoppm', [
         '-png',
         '-r',
         String(dpi),
@@ -49,7 +66,18 @@ export class BooksService {
         'yes',
         inputPath,
         path.join(bookDir, 'page'),
-      ]);
+      ]).finally(() => {
+        conversionComplete = true;
+      });
+
+      const progressPromise = this.trackConversionProgress(
+        bookDir,
+        normalizedBookName,
+        totalPages,
+        () => conversionComplete,
+      );
+
+      await Promise.all([conversionPromise, progressPromise]);
     } catch (error) {
       throw new InternalServerErrorException(
         `PDF conversion failed: ${
@@ -59,9 +87,11 @@ export class BooksService {
     } finally {
       // remove original PDF (saves disk space)
       await fs.unlink(inputPath).catch(() => undefined);
+      await this.booksDb
+        .clearProgress(normalizedBookName)
+        .catch(() => undefined);
     }
 
-    // 3. Read results (ONLY filenames, no buffers = faster)
     const pageFiles = (await fs.readdir(bookDir))
       .filter((f) => f.endsWith('.png'))
       .sort((a, b) => this.extractPageNumber(a) - this.extractPageNumber(b));
@@ -75,6 +105,8 @@ export class BooksService {
       )}/pages/${index + 1}`,
     }));
 
+    await this.booksDb.addBook(normalizedBookName, pages.length);
+
     return {
       bookName: normalizedBookName,
       pageCount: pages.length,
@@ -83,26 +115,60 @@ export class BooksService {
   }
 
   async listBooks(): Promise<BookSummary[]> {
-    await fs.mkdir(this.booksRoot, { recursive: true });
+    return this.booksDb.getAllBooks();
+  }
 
-    const entries = await fs.readdir(this.booksRoot, {
-      withFileTypes: true,
-    });
+  async getBookUploadProgress(
+    bookName: string,
+  ): Promise<BookUploadProgress | undefined> {
+    return this.booksDb.getProgress(bookName);
+  }
 
-    return Promise.all(
-      entries
-        .filter((e) => e.isDirectory())
-        .map(async (entry) => {
-          const dir = path.join(this.booksRoot, entry.name);
+  private async trackConversionProgress(
+    bookDir: string,
+    bookName: string,
+    totalPages: number,
+    shouldStop: () => boolean,
+  ): Promise<void> {
+    let currentPage = 0;
+    while (!shouldStop()) {
+      const pageFiles = (await fs.readdir(bookDir)).filter((f) =>
+        f.endsWith('.png'),
+      );
+      const nextPage = pageFiles.length;
+      if (nextPage > currentPage) {
+        currentPage = nextPage;
+        await this.booksDb.setProgress({
+          bookName,
+          totalPages,
+          currentPage,
+        });
+      }
+      await this.delay(250);
+    }
 
-          const files = await fs.readdir(dir);
-
-          return {
-            bookName: entry.name,
-            pageCount: files.filter((f) => f.endsWith('.png')).length,
-          };
-        }),
+    const pageFiles = (await fs.readdir(bookDir)).filter((f) =>
+      f.endsWith('.png'),
     );
+    await this.booksDb.setProgress({
+      bookName,
+      totalPages,
+      currentPage: pageFiles.length,
+    });
+  }
+
+  private async getPdfPageCount(inputPath: string): Promise<number> {
+    try {
+      const { stdout } = await execFileAsync('pdfinfo', [inputPath]);
+      const match = stdout.match(/^Pages:\s+(\d+)/m);
+      return match ? Number(match[1]) : 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async getBook(bookName: string): Promise<BookDetail> {
@@ -151,6 +217,23 @@ export class BooksService {
         `Page ${pageNumber} not found in "${normalizedBookName}"`,
       );
     }
+  }
+
+  async abortUpload(bookName: string): Promise<void> {
+    const normalizedBookName = this.normalizeBookName(
+      decodeURIComponent(bookName),
+    );
+
+    const bookDir = this.getBookDirectory(normalizedBookName);
+
+    try {
+      await fs.rm(bookDir, { recursive: true, force: true });
+    } catch {
+      // ignore if folder doesn't exist
+    }
+
+    await this.booksDb.clearProgress(normalizedBookName).catch(() => undefined);
+    await this.booksDb.deleteBook(normalizedBookName).catch(() => undefined);
   }
 
   private getBookDirectory(bookName: string): string {
