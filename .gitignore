@@ -10,6 +10,7 @@ node_modules/
 dist/
 build/
 out/
+storage/
 tsconfig.tsbuildinfo
 tsconfig.build.tsbuildinfo
 

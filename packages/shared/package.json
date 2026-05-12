@@ -2,10 +2,16 @@
   "name": "@cropbook/shared",
   "version": "1.0.0",
   "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc"
   },
   "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
     "./types": {
       "types": "./dist/types/index.d.ts"
     }
