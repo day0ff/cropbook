@@ -52,6 +52,8 @@ export class BooksService {
       currentPage: 0,
     });
 
+    await this.createBookIcon(inputPath, bookDir);
+
     let conversionComplete = false;
 
     try {
@@ -122,6 +124,50 @@ export class BooksService {
     bookName: string,
   ): Promise<BookUploadProgress | undefined> {
     return this.booksDb.getProgress(bookName);
+  }
+
+  async getBookIconFilePath(bookName: string): Promise<string> {
+    const normalizedBookName = this.normalizeBookName(
+      decodeURIComponent(bookName),
+    );
+
+    const bookDir = this.getBookDirectory(normalizedBookName);
+    await this.ensureBookExists(bookDir);
+
+    const iconPath = path.join(bookDir, 'icon.png');
+
+    try {
+      await fs.access(iconPath);
+      return iconPath;
+    } catch {
+      throw new NotFoundException(`Icon not found for "${normalizedBookName}"`);
+    }
+  }
+
+  private async createBookIcon(
+    inputPath: string,
+    bookDir: string,
+  ): Promise<void> {
+    const iconOutput = path.join(bookDir, 'icon');
+    await execFileAsync('pdftoppm', [
+      '-png',
+      '-singlefile',
+      '-scale-to-x',
+      '200',
+      '-scale-to-y',
+      '300',
+      '-gray',
+      '-aa',
+      'yes',
+      '-aaVector',
+      'yes',
+      '-f',
+      '1',
+      '-l',
+      '1',
+      inputPath,
+      iconOutput,
+    ]);
   }
 
   private async trackConversionProgress(

@@ -1,0 +1,40 @@
+import "./BooksList.css";
+import {useEffect, useState} from "react";
+import type {BookSummary} from "@cropbook/shared";
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+const BooksList = () => {
+    const [books, setBooks] = useState<Array<BookSummary> | null>(null);
+
+    useEffect(() => {
+        fetch(`${API_URL}/api/books`)
+            .then((res) => res.json())
+            .then((items) => setBooks(items));
+    }, []);
+
+    return books ? (
+        <ol className="books-list">
+            {books.map((book) => (
+                <li className="book-item" key={book.name}>
+                    {book.iconUrl ? (
+                        <img
+                            className="book-icon"
+                            src={book.iconUrl}
+                            alt={`${book.name} cover`}
+                        />
+                    ) : null}
+                    <span>{book.name}</span>
+                    <span className={"exercise-list"}>
+                        exercises: <span className={"exercise-list-item"} contentEditable="true">1,2,3,...</span>
+                    </span>
+                    <button className={"crop-button"}>Crop</button>
+                </li>
+            ))}
+        </ol>
+    ) : (
+        <p className="loading-text">Loading...</p>
+    );
+};
+
+export default BooksList;

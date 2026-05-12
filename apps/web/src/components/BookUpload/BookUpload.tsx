@@ -242,8 +242,8 @@ export function BookUpload() {
   };
 
   return (
-    <div className="book-upload-container">
-      <h2>Upload Book</h2>
+    <details className="book-upload-container">
+      <summary>Upload Book</summary>
 
       {!state.success ? (
         <>
@@ -314,7 +314,7 @@ export function BookUpload() {
                 <button
                   className="cancel-button"
                   onClick={handleCancel}
-                  disabled={!state.file || state.loading === false}
+                  disabled={!state.file || !state.loading}
                 >
                   Cancel
                 </button>
@@ -366,6 +366,6 @@ export function BookUpload() {
           </button>
         </div>
       )}
-    </div>
+    </details>
   );
 }

@@ -21,7 +21,6 @@
 }
 
 .app-main {
-  min-height: calc(100vh - 140px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,7 +42,6 @@
   }
 
   .app-main {
-    min-height: calc(100vh - 120px);
     padding: 1rem 0;
   }
 }

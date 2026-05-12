@@ -1,5 +1,5 @@
 import { memoryStorage } from 'multer';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import {
   BadRequestException,
   Body,
@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Post,
   Res,
+  Req,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -23,6 +24,13 @@ import { BooksService } from './books.service';
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksService: BooksService) {}
+
+  private buildBookIconUrl(req: Request, bookName: string): string {
+    const host = req.get('host') ?? 'localhost';
+    return `${req.protocol}://${host}/api/books/${encodeURIComponent(
+      bookName,
+    )}/icon`;
+  }
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', { storage: memoryStorage() }))
@@ -42,8 +50,22 @@ export class BooksController {
   }
 
   @Get()
-  async listBooks(): Promise<BookSummary[]> {
-    return this.booksService.listBooks();
+  async listBooks(@Req() req: Request): Promise<BookSummary[]> {
+    const books = await this.booksService.listBooks();
+
+    return books.map((book) => ({
+      ...book,
+      iconUrl: this.buildBookIconUrl(req, book.name),
+    }));
+  }
+
+  @Get(':bookName/icon')
+  async getBookIcon(
+    @Param('bookName') bookName: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const iconPath = await this.booksService.getBookIconFilePath(bookName);
+    res.type('image/png').sendFile(iconPath);
   }
 
   @Get(':bookName/status')

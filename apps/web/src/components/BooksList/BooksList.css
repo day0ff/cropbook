@@ -1,0 +1,87 @@
+.loading-text {
+  font-weight: bolder;
+  font-size: 32px;
+  line-height: 120%;
+  background: linear-gradient(
+    to right,
+    #333 20%,
+    #764ba2 40%,
+    #764ba2 60%,
+    #333 80%
+  );
+  background-size: 200% auto;
+
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  animation: shine 2s linear infinite;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.books-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: book-counter;
+}
+
+.book-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: start;
+  margin-bottom: 12px;
+  counter-increment: book-counter;
+}
+
+.book-item::before {
+  content: counter(book-counter) ".";
+  font-weight: bold;
+  min-width: 20px;
+}
+
+.book-icon {
+  aspect-ratio: 2 / 3;
+  width: 32px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #f4f4f4;
+}
+
+.exercise-list {
+  display: inline-flex;
+  flex-grow: 1;
+  justify-content: end;
+}
+
+.exercise-list-item {
+  display: inline-block;
+  min-width: 80px;
+  padding: 0 16px;
+}
+
+.crop-button  {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  min-width: 150px;
+  transition: background 0.3s ease;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  &:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  }
+}

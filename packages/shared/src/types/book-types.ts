@@ -14,6 +14,7 @@ export interface BookDetail {
 export interface BookSummary {
   name: string;
   pages: number;
+  iconUrl?: string;
 }
 
 export interface BookUploadProgress {
