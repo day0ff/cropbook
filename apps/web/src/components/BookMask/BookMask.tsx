@@ -11,8 +11,7 @@ const BookMask: FC<{ bookName: string | undefined }> = ({bookName}) => {
         event.preventDefault();
 
         const formData = new FormData(event.currentTarget as HTMLFormElement);
-        const start = formData.get('start')?.toString() ?? '';
-        const end = formData.get('end')?.toString() ?? '';
+        const anchor = formData.get('anchor')?.toString() ?? '';
 
         setProcessing({
             type: 'progress',
@@ -27,12 +26,7 @@ const BookMask: FC<{ bookName: string | undefined }> = ({bookName}) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                masks: {
-                    start,
-                    end
-                }
-            }),
+            body: JSON.stringify({anchor}),
         })
             .then((res) => res.json())
             .then((items) => console.log(items));
@@ -76,12 +70,8 @@ const BookMask: FC<{ bookName: string | undefined }> = ({bookName}) => {
         <form onSubmit={handleMaskSubmit}>
             <fieldset disabled={isProcessing}>
                 <span>Masks:</span>
-                <label htmlFor="start">start:</label>
-                <input name="start" className="editable" type="text" value={'\\d+\\.\\d+\\.'} placeholder="mask"/>
-                <label htmlFor="end">end:</label>
-                <input name="end" className="editable" type="text" value={'\\d+\\.\\d+\\.'} placeholder="mask"/>
-                <button className={"book-button"} type="submit"
-                        disabled={isProcessing && !bookName}>{isProcessing ? 'Processing' : 'Mask'}</button>
+                <input name="anchor" className="editable" type="text" defaultValue={'\\d+\\.\\d+\\.'} placeholder="anchor"/>
+                <button className={"book-button"} type="submit" disabled={isProcessing && !bookName}>{isProcessing ? 'Processing' : 'Mask'}</button>
             </fieldset>
             {isProcessing && (
                 <div className="book-progress-container">

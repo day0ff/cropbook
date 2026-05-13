@@ -12,7 +12,7 @@ export class OcrController {
     @Param('bookName') bookName: string,
     @Body() dto: CreateOcrMetadataDto,
   ) {
-    void this.ocrService.startJob(bookName, dto);
+    void this.ocrService.startJob(bookName, dto.anchor);
 
     return {
       success: true,

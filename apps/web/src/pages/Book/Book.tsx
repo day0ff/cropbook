@@ -3,6 +3,7 @@ import {useParams} from "react-router";
 import type {BookDetail} from "@cropbook/shared";
 import "./Book.css";
 import BookMask from "../../components/BookMask";
+import BookCrop from "../../components/BookCrop";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,15 +26,8 @@ const Book = () => {
                 />}
                 {bookName}
             </h1>
-            <BookMask bookName={bookName} />
-            <form>
-                <fieldset disabled={false}>
-                    <label htmlFor="exercises">Exercises:</label>
-                    <input name="exercises" className="editable" type="text" value={'1.1., 2.1, 6.1, 15.1, 19.1.'}
-                           placeholder="enter number of exercises"/>
-                    <button className={"book-button"} type="submit">Crop</button>
-                </fieldset>
-            </form>
+            <BookMask bookName={bookName}/>
+            <BookCrop bookName={bookName}/>
         </div>
     );
 }
