@@ -3,7 +3,7 @@ import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node';
 import * as path from 'path';
 import { promises as fs } from 'fs';
-import { BookUploadProgress } from '@cropbook/shared/types';
+import { BookUploadProgress, MetaDataType } from '@cropbook/shared/types';
 
 interface BookRecord {
   name: string;
@@ -13,6 +13,7 @@ interface BookRecord {
 interface BooksDb {
   books: BookRecord[];
   progress: Record<string, BookUploadProgress>;
+  metadata: Record<string, Record<string, MetaDataType>>;
 }
 
 @Injectable()
@@ -34,11 +35,19 @@ export class BooksDbService implements OnModuleInit {
     await fs.mkdir(dbDir, { recursive: true });
 
     const adapter = new JSONFile<BooksDb>(this.dbPath);
-    this.db = new Low<BooksDb>(adapter, { books: [], progress: {} });
+    this.db = new Low<BooksDb>(adapter, {
+      books: [],
+      progress: {},
+      metadata: {},
+    });
     await this.db.read();
 
     if (!this.db.data) {
-      this.db.data = { books: [], progress: {} };
+      this.db.data = {
+        books: [],
+        progress: {},
+        metadata: {},
+      };
     }
   }
 
@@ -83,6 +92,26 @@ export class BooksDbService implements OnModuleInit {
   async getBook(name: string): Promise<BookRecord | undefined> {
     if (!this.db) throw new Error('Database not initialized');
     return this.db.data.books.find((book) => book.name === name);
+  }
+
+  async saveMetadata(
+    bookName: string,
+    key: string,
+    metadata: MetaDataType,
+  ): Promise<void> {
+    if (!this.db) throw new Error('Database not initialized');
+
+    if (!this.db.data.metadata[bookName]) {
+      this.db.data.metadata[bookName] = {};
+    }
+
+    this.db.data.metadata[bookName][key] = metadata;
+    await this.db.write();
+  }
+
+  async getMetadata(bookName: string): Promise<Record<string, MetaDataType>> {
+    if (!this.db) throw new Error('Database not initialized');
+    return this.db.data.metadata[bookName] ?? {};
   }
 
   async deleteBook(name: string): Promise<void> {

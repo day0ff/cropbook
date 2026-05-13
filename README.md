@@ -30,6 +30,51 @@ cd cropbook
 pnpm install
 ```
 
+Install necessary libs:
+
+ - System libraries for graphics
+
+```bash
+sudo apt install -y \\
+    libgl1-mesa-glx \\
+    libglib2.0-0 \\
+    libsm6 \\
+    libxext6 \\
+    libxrender-dev \\
+    libgomp1 \\
+    libgthread-2.0-0 \\
+    libgtk2.0-dev \\
+    pkg-config
+```
+
+ - Python Environment and Package Manager
+
+```bash
+sudo apt install -y python3 python3-pip python3-dev
+```
+
+ - Installing the AI core (PaddlePaddle and PaddleOCR)
+
+```bash
+pip3 install --user paddlepaddle
+pip3 install --user paddlepaddle-gpu
+pip3 install --user paddleocr
+```
+
+ - Health check in the console
+
+```bash
+paddleocr --version
+# or
+python3 -c 'import paddleocr; print("PaddleOCR installed successfully!")'
+
+```
+- On ruamel.yaml not installed error
+```bash
+python3 -m pip install ruamel.yaml
+#or
+/usr/bin/python3 -m pip install --user ruamel.yaml
+```
 ## 📖 Usage
 
 ```typescript

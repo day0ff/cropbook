@@ -13,5 +13,6 @@ import { BooksDbService } from './books-db.service';
   ],
   controllers: [BooksController],
   providers: [BooksService, BooksDbService],
+  exports: [BooksService, BooksDbService],
 })
 export class BooksModule {}

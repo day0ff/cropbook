@@ -107,7 +107,7 @@ export class BooksService {
       )}/pages/${index + 1}`,
     }));
 
-    await this.booksDb.addBook(normalizedBookName, pages.length);
+    await this.booksDb.addBook(normalizedBookName, pages.length - 1);
 
     return {
       bookName: normalizedBookName,
@@ -229,18 +229,21 @@ export class BooksService {
       .filter((f) => f.endsWith('.png'))
       .sort((a, b) => this.extractPageNumber(a) - this.extractPageNumber(b));
 
-    const pages: BookPage[] = pageFiles.map((fileName, index) => ({
-      bookName: normalizedBookName,
-      pageNumber: index + 1,
-      fileName,
-      url: `/books/${encodeURIComponent(
-        normalizedBookName,
-      )}/pages/${index + 1}`,
-    }));
+    const pages: BookPage[] = pageFiles
+      .filter((fileName) => !fileName.includes('icon'))
+      .map((fileName, index) => ({
+        bookName: normalizedBookName,
+        pageNumber: index + 1,
+        fileName,
+        url: `/books/${encodeURIComponent(
+          normalizedBookName,
+        )}/pages/${index + 1}`,
+      }));
 
     return {
       bookName: normalizedBookName,
       pageCount: pages.length,
+      iconUrl: `/books/${normalizedBookName}/icon`,
       pages,
     };
   }

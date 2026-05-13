@@ -1,6 +1,1 @@
-.home-container {
-    display: flex;
-    flex-direction: column;
-    width: 80vw;
-    max-width: 800px;
-}
+.home-container {}

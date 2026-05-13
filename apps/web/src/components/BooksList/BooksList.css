@@ -47,6 +47,19 @@
   min-width: 20px;
 }
 
+.book-item-link{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: all ease-in-out 0.3s;
+  &:hover{
+    filter: sepia(90%) hue-rotate(215deg);
+  }
+}
+
 .book-icon {
   aspect-ratio: 2 / 3;
   width: 32px;
@@ -55,13 +68,13 @@
   background: #f4f4f4;
 }
 
-.exercise-list {
+.mask-list {
   display: inline-flex;
   flex-grow: 1;
   justify-content: end;
 }
 
-.exercise-list-item {
+.mask-list-item {
   display: inline-block;
   min-width: 80px;
   padding: 0 16px;
