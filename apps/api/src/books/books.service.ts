@@ -240,10 +240,13 @@ export class BooksService {
         )}/pages/${index + 1}`,
       }));
 
+    const masks: Array<string> = await this.booksDb.getBookMasks(normalizedBookName);
+
     return {
       bookName: normalizedBookName,
       pageCount: pages.length,
       iconUrl: `/books/${normalizedBookName}/icon`,
+      masks,
       pages,
     };
   }

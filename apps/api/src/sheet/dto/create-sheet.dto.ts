@@ -8,6 +8,9 @@ export class CreateSheetDto {
   @IsString()
   outputFileName!: string;
 
+  @IsString()
+  mask!: string;
+
   @IsArray()
   @ArrayMinSize(1)
   items!: string[];

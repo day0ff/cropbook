@@ -15,6 +15,7 @@ export class SheetController {
   ) {
     const buffer = await this.imageSheetService.createA4Sheet({
       bookName,
+      regexp: body.mask,
       items: body.items,
       returnBuffer: true,
     });

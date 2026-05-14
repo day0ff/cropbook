@@ -18,20 +18,19 @@ const BooksList = () => {
         <ol className="books-list">
             {books.map((book) => (
                 <li className="book-item" key={book.name}>
-                    <Link to={`book/${book.name}`} className={"book-item-link"}>
-                        {book.iconUrl ? (
-                            <img
-                                className="book-icon"
-                                src={book.iconUrl}
-                                alt={`${book.name} cover`}
-                            />
-                        ) : null}
-                        <span>{book.name}</span>
-                    </Link>
-                    <span className={"mask-list"}>
-                        exercises: <span className={"mask-list-item"} contentEditable="true">1.2., 2.3., 4.5., 16.1., 19.1.</span>
+                    {book.iconUrl ? (
+                        <img
+                            className="book-icon"
+                            src={book.iconUrl}
+                            alt={`${book.name} cover`}
+                        />
+                    ) : null}
+                    <span>{book.name}</span>
+                    <span style={{marginInlineStart: 'auto'}}>
+                        <span>pages: </span>
+                        <span>{book.pages}</span>
+                        <Link to={`book/${book.name}`} className={"crop-button"}>Crop</Link>
                     </span>
-                    <button className={"crop-button"}>Crop</button>
                 </li>
             ))}
         </ol>

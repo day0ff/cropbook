@@ -13,7 +13,7 @@ interface BookRecord {
 interface BooksDb {
   books: BookRecord[];
   progress: Record<string, BookUploadProgress>;
-  metadata: Record<string, Record<string, MetaDataType>>;
+  metadata: Record<string, Record<string, Record<string, MetaDataType>>>;
 }
 
 @Injectable()
@@ -96,6 +96,7 @@ export class BooksDbService implements OnModuleInit {
 
   async saveMetadata(
     bookName: string,
+    regexp: string,
     key: string,
     metadata: MetaDataType,
   ): Promise<void> {
@@ -105,13 +106,35 @@ export class BooksDbService implements OnModuleInit {
       this.db.data.metadata[bookName] = {};
     }
 
-    this.db.data.metadata[bookName][key] = metadata;
+    if (!this.db.data.metadata[bookName][regexp]) {
+      this.db.data.metadata[bookName][regexp] = {};
+    }
+
+    this.db.data.metadata[bookName][regexp][key] = metadata;
     await this.db.write();
   }
 
-  async getMetadata(bookName: string): Promise<Record<string, MetaDataType>> {
+  async getMetadata(
+    bookName: string,
+  ): Promise<Record<string, Record<string, MetaDataType>>> {
     if (!this.db) throw new Error('Database not initialized');
     return this.db.data.metadata[bookName] ?? {};
+  }
+
+  async getBookMasks(
+    bookName: string,
+  ): Promise<Array<string>> {
+    const metadata = await this.getMetadata(bookName);
+
+    return Object.keys(metadata);
+  }
+
+  async getMetadataByMask(
+    bookName: string,
+    mask: string,
+  ): Promise<Record<string, MetaDataType>> {
+    if (!this.db) throw new Error('Database not initialized');
+    return this.db.data.metadata[bookName][mask] ?? {};
   }
 
   async deleteBook(name: string): Promise<void> {

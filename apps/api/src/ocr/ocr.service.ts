@@ -13,6 +13,7 @@ import { Subject } from 'rxjs';
 
 import { BooksDbService } from '../books/books-db.service';
 import { MetaDataType, ProcessingType } from '@cropbook/shared/types';
+import { parsePages } from 'src/helpers';
 
 const execFileAsync = promisify(execFile);
 
@@ -56,6 +57,7 @@ export class OcrService {
   async *extractAndSaveMetadata(
     bookName: string,
     anchor: RegExp,
+    pages?: string,
   ): AsyncGenerator<ProcessingType<Record<string, MetaDataType>>> {
     const normalizedBookName = this.normalizeBookName(
       decodeURIComponent(bookName),
@@ -71,15 +73,21 @@ export class OcrService {
 
     await this.ensureBookExists(bookDir);
 
+    const targetPages: number[] = parsePages(pages ?? `1-${bookRecord.pages}`);
+
+    const validPages = targetPages.filter((page) => page <= bookRecord.pages);
+
     try {
       const totalLength = bookRecord.pages.toString().length;
 
       let metadataCombined: Record<string, MetaDataType> = {};
+      let current = 0;
 
-      for (let page = 1; page <= bookRecord.pages; page += 1) {
+      for (const page of validPages) {
         const formattedPage = page.toString().padStart(totalLength, '0');
-
         const pageFile = path.join(bookDir, `page-${formattedPage}.png`);
+
+        current += 1;
 
         if (!(await this.fileExists(pageFile))) {
           continue;
@@ -88,8 +96,8 @@ export class OcrService {
         yield {
           type: 'progress',
           data: {
-            total: bookRecord.pages,
-            current: page,
+            total: validPages.length,
+            current,
           },
         };
 
@@ -102,14 +110,17 @@ export class OcrService {
         for (const metadata of metadataItems) {
           await this.booksDb.saveMetadata(
             normalizedBookName,
+            anchor.source,
             metadata.key.match(anchor)?.[0] ?? '',
             metadata.value,
           );
         }
 
         if (metadataItems.length > 0) {
-          const savedMetadata =
-            await this.booksDb.getMetadata(normalizedBookName);
+          const savedMetadata = await this.booksDb.getMetadataByMask(
+            normalizedBookName,
+            anchor.source,
+          );
 
           metadataCombined = {
             ...metadataCombined,
@@ -276,6 +287,7 @@ export class OcrService {
       throw new BadRequestException('Mask patterns must be non-empty strings.');
     }
 
+    console.log(RegExp, value);
     try {
       return new RegExp(value);
     } catch (error) {
@@ -287,7 +299,11 @@ export class OcrService {
     }
   }
 
-  async startJob(bookName: string, anchor: string): Promise<void> {
+  async startJob(
+    bookName: string,
+    anchor: string,
+    pages?: string,
+  ): Promise<void> {
     const normalizedBookName = this.normalizeBookName(bookName);
     const regex = this.buildRegex(anchor);
 
@@ -303,6 +319,7 @@ export class OcrService {
       for await (const event of this.extractAndSaveMetadata(
         normalizedBookName,
         regex,
+        pages,
       )) {
         subject.next(event);
       }

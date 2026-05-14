@@ -39,6 +39,7 @@ export class SheetService {
   async createA4Sheet(options: CreateSheetOptions): Promise<Buffer | string> {
     const {
       bookName,
+      regexp,
       items,
       outputFileName = 'sheet.png',
       returnBuffer = false,
@@ -47,7 +48,10 @@ export class SheetService {
       decodeURIComponent(bookName),
     );
     const bookRecord = await this.booksDb.getBook(normalizedBookName);
-    const metaData = await this.booksDb.getMetadata(normalizedBookName);
+    const metaData = await this.booksDb.getMetadataByMask(
+      normalizedBookName,
+      regexp,
+    );
     const metaDataItems = items.map((item) => metaData[item]).filter((item) => !!item);
 
     const crops = await this.cropAll(bookRecord, metaDataItems);

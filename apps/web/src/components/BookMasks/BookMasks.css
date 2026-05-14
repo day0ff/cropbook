@@ -1,0 +1,24 @@
+.book-masks {
+   & h2 {
+       margin-bottom: 20px;
+       padding: 0 14px;
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+
+       & .book-button {
+           margin-left: auto;
+           margin-right: 0;
+           padding: 12px 20px;
+           background: #fff;
+           color: #667eea;
+           flex: 1;
+           max-width: 180px;
+           min-width: 150px;
+           border: solid 1px #667eea;
+           &:hover {
+               background: aliceblue;
+           }
+       }
+   }
+}

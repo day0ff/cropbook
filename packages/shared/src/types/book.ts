@@ -9,6 +9,7 @@ export interface BookDetail {
   bookName: string;
   pageCount: number;
   iconUrl?: string;
+  masks?: string[];
   pages: BookPage[];
 }
 

@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     width: 80vw;
-    max-width: 800px;
+    max-width: 860px;
     & h1 {
         display: flex;
         align-items: center;
@@ -15,7 +15,7 @@
         aspect-ratio: 2 / 3;
     }
     & form {
-        margin-bottom: 40px;
+        margin: 10px 0;
     }
     & fieldset {
         display: grid;
@@ -43,6 +43,11 @@ label {
     width: 100%;
     text-align: start;
     font-size: 21px;
+
+    &[name="outputFileName"] {
+        color: #6b6375;
+        border: none;
+    }
 }
 
 .book-button  {

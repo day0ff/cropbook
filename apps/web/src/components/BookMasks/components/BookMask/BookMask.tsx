@@ -3,7 +3,13 @@ import type {ProcessingType} from "@cropbook/shared";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const BookMask: FC<{ bookName: string | undefined }> = ({bookName}) => {
+const BookMask: FC<{ bookName: string, pageCount: number, mask?: string }> = (
+    {
+        bookName,
+        pageCount,
+        mask
+    }
+) => {
     const eventSourceRef = useRef<EventSource | null>(null);
     const [processing, setProcessing] = useState<ProcessingType<any>>();
 
@@ -11,6 +17,7 @@ const BookMask: FC<{ bookName: string | undefined }> = ({bookName}) => {
         event.preventDefault();
 
         const formData = new FormData(event.currentTarget as HTMLFormElement);
+        const pages = formData.get('pages')?.toString() ?? '';
         const anchor = formData.get('anchor')?.toString() ?? '';
 
         setProcessing({
@@ -26,10 +33,8 @@ const BookMask: FC<{ bookName: string | undefined }> = ({bookName}) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({anchor}),
-        })
-            .then((res) => res.json())
-            .then((items) => console.log(items));
+            body: JSON.stringify({anchor, pages}),
+        });
 
         const es = new EventSource(
             `${API_URL}/api/books/${bookName}/ocr/events`,
@@ -69,9 +74,15 @@ const BookMask: FC<{ bookName: string | undefined }> = ({bookName}) => {
     return (
         <form onSubmit={handleMaskSubmit}>
             <fieldset disabled={isProcessing}>
-                <span>Masks:</span>
-                <input name="anchor" className="editable" type="text" defaultValue={'\\d+\\.\\d+\\.'} placeholder="anchor"/>
-                <button className={"book-button"} type="submit" disabled={isProcessing && !bookName}>{isProcessing ? 'Processing' : 'Mask'}</button>
+                <span>Mask:</span>
+                <input name="anchor" className="editable" type="text" defaultValue={mask || '\\d+\\.\\d+\\.'}
+                                                          placeholder="define new mask"/>
+                <label htmlFor="pages">pages:</label>
+                <input name="pages" className="editable" type="text" defaultValue={`1-${pageCount}`}
+                       placeholder="pages"/>
+
+                <button className={"book-button"} type="submit"
+                        disabled={isProcessing && !bookName}>{isProcessing ? 'Processing' : 'Mask'}</button>
             </fieldset>
             {isProcessing && (
                 <div className="book-progress-container">
@@ -91,6 +102,7 @@ const BookMask: FC<{ bookName: string | undefined }> = ({bookName}) => {
                 </div>
             )}
         </form>
+
     );
 }
 

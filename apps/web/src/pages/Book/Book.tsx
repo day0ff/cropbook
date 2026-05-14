@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {useParams} from "react-router";
 import type {BookDetail} from "@cropbook/shared";
 import "./Book.css";
-import BookMask from "../../components/BookMask";
+import BookMasks from "../../components/BookMasks";
 import BookCrop from "../../components/BookCrop";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -12,6 +12,8 @@ const Book = () => {
     const [book, setBook] = useState<BookDetail>();
 
     useEffect(() => {
+        if (!bookName) return;
+
         fetch(`${API_URL}/api/books/${bookName}`)
             .then((res) => res.json())
             .then((items) => setBook(items));
@@ -26,8 +28,8 @@ const Book = () => {
                 />}
                 {bookName}
             </h1>
-            <BookMask bookName={bookName}/>
-            <BookCrop bookName={bookName}/>
+            <BookMasks bookName={bookName} />
+            <BookCrop bookName={bookName} />
         </div>
     );
 }
