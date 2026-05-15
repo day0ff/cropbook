@@ -29,10 +29,10 @@ const BookMasks: FC<{ bookName: string | undefined }> = ({bookName = ''}) => {
 
     return (
         <div className="book-masks">
+            <hr/>
             <h2><span>Masks:</span>
                 <button className="book-button" onClick={handleAddNewMask}>Add Mask</button>
             </h2>
-            <hr/>
             {book?.masks ? (
                 book.masks.map(mask => (<BookMask key={mask} bookName={book.bookName} pageCount={book.pageCount} mask={mask}/>))
             ) : (

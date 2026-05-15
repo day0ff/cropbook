@@ -8,6 +8,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Res,
   Req,
   UploadedFile,
@@ -18,12 +19,18 @@ import {
   BookDetail,
   BookSummary,
   BookUploadProgress,
+  MetaDataType,
 } from '@cropbook/shared/types';
 import { BooksService } from './books.service';
+import { BooksDbService } from './books-db.service';
+import { UpdatePageMetadataDto } from './dto/update-page-metadata.dto';
 
 @Controller('books')
 export class BooksController {
-  constructor(private readonly booksService: BooksService) {}
+  constructor(
+    private readonly booksService: BooksService,
+    private readonly booksDb: BooksDbService,
+  ) {}
 
   private buildBookIconUrl(req: Request, bookName: string): string {
     const host = req.get('host') ?? 'localhost';
@@ -91,6 +98,59 @@ export class BooksController {
   @Get(':bookName')
   async getBook(@Param('bookName') bookName: string): Promise<BookDetail> {
     return this.booksService.getBook(bookName);
+  }
+
+  @Get(':bookName/pages/:pageNumber/metadata')
+  async getPageMetadata(
+    @Param('bookName') bookName: string,
+    @Param('pageNumber', ParseIntPipe) pageNumber: number,
+  ): Promise<{
+    masks: string[];
+    metadataByMask: Record<string, Array<{ key: string; value: MetaDataType }>>;
+  }> {
+    const normalizedBookName = this.booksService.normalizeBookName(bookName);
+    const masks = await this.booksDb.getBookMasks(normalizedBookName);
+    const metadataByMask: Record<
+      string,
+      Array<{ key: string; value: MetaDataType }>
+    > = {};
+
+    for (const mask of masks) {
+      const metadata = await this.booksDb.getMetadataByMask(
+        normalizedBookName,
+        mask,
+      );
+      metadataByMask[mask] = Object.entries(metadata)
+        .filter(([, value]) => value.page === pageNumber)
+        .map(([key, value]) => ({ key, value }));
+    }
+
+    return {
+      masks,
+      metadataByMask,
+    };
+  }
+
+  @Put(':bookName/pages/:pageNumber/metadata')
+  async updatePageMetadata(
+    @Param('bookName') bookName: string,
+    @Param('pageNumber', ParseIntPipe) pageNumber: number,
+    @Body() dto: UpdatePageMetadataDto,
+  ): Promise<{ success: boolean }> {
+    const normalizedBookName = this.booksService.normalizeBookName(bookName);
+
+    if (dto.metadata.page !== pageNumber) {
+      throw new BadRequestException('Metadata page mismatch.');
+    }
+
+    await this.booksDb.saveMetadata(
+      normalizedBookName,
+      dto.mask,
+      dto.key,
+      dto.metadata,
+    );
+
+    return { success: true };
   }
 
   @Post(':bookName/abort')

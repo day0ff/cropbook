@@ -287,7 +287,6 @@ export class OcrService {
       throw new BadRequestException('Mask patterns must be non-empty strings.');
     }
 
-    console.log(RegExp, value);
     try {
       return new RegExp(value);
     } catch (error) {

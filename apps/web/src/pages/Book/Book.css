@@ -1,105 +1,127 @@
 .book-container {
+  display: flex;
+  flex-direction: column;
+  width: 80vw;
+  max-width: 860px;
+  & h1 {
     display: flex;
-    flex-direction: column;
-    width: 80vw;
-    max-width: 860px;
-    & h1 {
-        display: flex;
-        align-items: center;
-        justify-content: space-evenly;
-        font-weight: bolder;
-        color: #6e3f9e;
+    align-items: center;
+    justify-content: space-evenly;
+    font-weight: bolder;
+    color: #6e3f9e;
+  }
+  & img {
+    width: 100px;
+    aspect-ratio: 2 / 3;
+  }
+  & form {
+    margin: 10px 0;
+  }
+
+  & .book-page-links {
+    margin-top: 20px;
+    padding: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    background: #fbfbfb;
+  }
+
+  & .page-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  & .page-links-more {
+    align-self: center;
+    color: #6b6375;
+  }
+  & fieldset {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    align-items: center;
+    gap: 40px;
+    border: none;
+    & > :first-child {
+      justify-self: start;
     }
-    & img {
-        width: 100px;
-        aspect-ratio: 2 / 3;
+    & > :last-child {
+      justify-self: end;
     }
-    & form {
-        margin: 10px 0;
-    }
-    & fieldset {
-        display: grid;
-        grid-auto-flow: column;
-        grid-auto-columns: 1fr;
-        align-items: center;
-        gap: 40px;
-        border: none;
-        & > :first-child {
-            justify-self: start;
-        }
-        & > :last-child {
-            justify-self: end;
-        }
-    }
+  }
 }
 
 label {
-    text-align: end;
+  text-align: end;
 }
 
 .editable {
-    display: inline-block;
-    min-width: 120px;
-    width: 100%;
-    text-align: start;
-    font-size: 21px;
+  display: inline-block;
+  min-width: 120px;
+  width: 100%;
+  text-align: start;
+  font-size: 21px;
 
-    &[name="outputFileName"] {
-        color: #6b6375;
-        border: none;
-    }
+  &[name="outputFileName"] {
+    color: #6b6375;
+    border: none;
+  }
 }
 
-.book-button  {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 6px;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    min-width: 180px;
-    transition: background 0.3s ease;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.book-button {
+  box-sizing: border-box;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  width: 180px;
+  transition: background 0.3s ease;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  text-decoration: none;
 
-    &:disabled {
-        pointer-events: none;
-        filter: grayscale(50%) brightness(140%);
-    }
-    &:hover {
-        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    }
+  &:disabled {
+    pointer-events: none;
+    filter: grayscale(50%) brightness(140%);
+  }
+  &:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  }
 }
 
 .book-progress-container {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .book-progress-bar {
-    width: 100%;
-    height: 8px;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 0.75rem;
-    background-color: #c2c0c6;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  background-color: #c2c0c6;
 }
 
 .book-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #86efac, #4ade80);
-    border-radius: 4px;
-    transition: width 10s linear;
-    box-shadow: 0 0 10px rgba(134, 239, 172, 0.5);
+  height: 100%;
+  background: linear-gradient(90deg, #86efac, #4ade80);
+  border-radius: 4px;
+  transition: width 10s linear;
+  box-shadow: 0 0 10px rgba(134, 239, 172, 0.5);
 }
 
 .book-progress-text {
-    margin: 0;
-    font-size: 0.875rem;
-    text-align: center;
-    font-weight: 500;
+  margin: 0;
+  font-size: 0.875rem;
+  text-align: center;
+  font-weight: 500;
 }

@@ -5,3 +5,10 @@ export type CreateSheetOptions = {
   outputFileName?: string;
   returnBuffer?: boolean;
 };
+
+export type CreatePagesOptions = {
+  bookName: string;
+  regexp: string;
+  pages: string;
+  returnBuffer?: boolean;
+};

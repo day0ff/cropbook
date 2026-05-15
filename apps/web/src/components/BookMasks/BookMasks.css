@@ -1,6 +1,6 @@
 .book-masks {
    & h2 {
-       margin-bottom: 20px;
+       margin: 20px 0;
        padding: 0 14px;
        display: flex;
        justify-content: space-between;

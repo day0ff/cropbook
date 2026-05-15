@@ -1,11 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import sharp from 'sharp';
 import path from 'node:path';
-import fs from 'node:fs/promises';
-import { MetaDataType } from '@cropbook/shared';
-import { A4_HEIGHT, A4_WIDTH, GAP, PAGE_PADDING } from './constants';
-import { CreateSheetOptions } from './types';
+import { MetaDataType } from '@cropbook/shared/types';
+import {
+  A4_HEIGHT,
+  A4_WIDTH,
+  GAP,
+  PAGE_PADDING,
+} from '@cropbook/shared/constants';
+import { CreatePagesOptions, CreateSheetOptions } from './types';
 import { BooksDbService } from 'src/books/books-db.service';
+import { parsePages } from 'src/helpers';
 
 type CropResult = {
   buffer: Buffer;
@@ -52,7 +57,9 @@ export class SheetService {
       normalizedBookName,
       regexp,
     );
-    const metaDataItems = items.map((item) => metaData[item]).filter((item) => !!item);
+    const metaDataItems = items
+      .map((item) => metaData[item])
+      .filter((item) => !!item);
 
     const crops = await this.cropAll(bookRecord, metaDataItems);
 
@@ -64,7 +71,51 @@ export class SheetService {
 
     const outputPath = path.join(this.storagePath, bookName, outputFileName);
 
-     // await fs.writeFile(outputPath, resultBuffer);
+    // await fs.writeFile(outputPath, resultBuffer);
+
+    return outputPath;
+  }
+
+  async createA4Pages(options: CreatePagesOptions): Promise<Buffer | string> {
+    const {
+      bookName,
+      regexp,
+      pages,
+      returnBuffer = false,
+    } = options;
+    const normalizedBookName = this.normalizeBookName(
+      decodeURIComponent(bookName),
+    );
+    const bookRecord = await this.booksDb.getBook(normalizedBookName);
+
+    if (!bookRecord) {
+      throw new NotFoundException(`Book not found: ${normalizedBookName}`);
+    }
+
+    const metaData = await this.booksDb.getMetadataByMask(
+      normalizedBookName,
+      regexp,
+    );
+    const targetPages: number[] = parsePages(pages ?? `1-${bookRecord.pages}`);
+    const metaDataItems = Object.values(metaData).filter(
+      (data) => targetPages.includes(data.page)
+    );
+
+    const crops = await this.cropAll(bookRecord, metaDataItems);
+
+    const resultBuffer = await this.composeA4(crops);
+
+    if (returnBuffer) {
+      return resultBuffer;
+    }
+
+    const outputPath = path.join(
+      this.storagePath,
+      bookName,
+      `pages(${pages}).png`,
+    );
+
+    // await fs.writeFile(outputPath, resultBuffer);
 
     return outputPath;
   }
@@ -82,7 +133,11 @@ export class SheetService {
   ): Promise<CropResult> {
     const pageName = `page-${String(item.page).padStart(bookRecord?.pages.toString().length ?? 0, '0')}.png`;
 
-    const pagePath = path.join(this.storagePath, bookRecord?.name ?? '', pageName);
+    const pagePath = path.join(
+      this.storagePath,
+      bookRecord?.name ?? '',
+      pageName,
+    );
 
     const width = item.right - item.left;
     const height = item.bottom - item.top;

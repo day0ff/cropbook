@@ -144,6 +144,10 @@ export class BooksService {
     }
   }
 
+  normalizeBookName(name: string): string {
+    return this.normalizeBookNameImpl(name);
+  }
+
   private async createBookIcon(
     inputPath: string,
     bookDir: string,
@@ -240,7 +244,8 @@ export class BooksService {
         )}/pages/${index + 1}`,
       }));
 
-    const masks: Array<string> = await this.booksDb.getBookMasks(normalizedBookName);
+    const masks: Array<string> =
+      await this.booksDb.getBookMasks(normalizedBookName);
 
     return {
       bookName: normalizedBookName,
@@ -255,15 +260,22 @@ export class BooksService {
     const normalizedBookName = this.normalizeBookName(
       decodeURIComponent(bookName),
     );
-
     const bookDir = this.getBookDirectory(normalizedBookName);
     await this.ensureBookExists(bookDir);
 
-    const filePath = path.join(bookDir, `${pageNumber}.png`);
+    const bookRecord = await this.booksDb.getBook(normalizedBookName);
+
+    if (!bookRecord) {
+      throw new NotFoundException(`Book not found: ${normalizedBookName}`);
+    }
+
+    const totalLength = bookRecord.pages.toString().length;
+    const formattedPage = pageNumber.toString().padStart(totalLength, '0');
+    const pageFile = path.join(bookDir, `page-${formattedPage}.png`);
 
     try {
-      await fs.access(filePath);
-      return filePath;
+      await fs.access(pageFile);
+      return pageFile;
     } catch {
       throw new NotFoundException(
         `Page ${pageNumber} not found in "${normalizedBookName}"`,
@@ -305,7 +317,7 @@ export class BooksService {
     return match ? Number(match[match.length - 1]) : 0;
   }
 
-  private normalizeBookName(name: string): string {
+  private normalizeBookNameImpl(name: string): string {
     const original = name.trim().replace(/\.[^.]+$/, '');
     return (
       original.replace(/[^a-zA-Z0-9-_]/g, '_').replace(/_+/g, '_') || 'book'

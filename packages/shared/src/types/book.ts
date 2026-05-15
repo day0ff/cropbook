@@ -19,11 +19,6 @@ export interface BookSummary {
   iconUrl?: string;
 }
 
-export interface MaskType {
-  start: string;
-  end: string;
-}
-
 export interface MetaDataType {
   page: number;
   top: number;
@@ -32,12 +27,14 @@ export interface MetaDataType {
   bottom: number;
 }
 
-export interface BookOcrSummary {
-  name: string;
-  pages: number;
-  iconUrl?: string;
-  masks: MaskType;
-  matches: Record<string, MetaDataType>;
+export interface PageMetadataItem {
+  key: string;
+  value: MetaDataType;
+}
+
+export interface PageMetadataResponse {
+  masks: string[];
+  metadataByMask: Record<string, PageMetadataItem[]>;
 }
 
 export interface BookUploadProgress {
