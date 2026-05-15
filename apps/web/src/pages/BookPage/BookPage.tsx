@@ -1,7 +1,7 @@
 import {useEffect, useMemo, useState, type FormEvent} from "react";
 import {Link, useParams} from "react-router";
-import type {MetaDataType} from "@cropbook/shared/types";
-import {A4_HEIGHT, A4_WIDTH, PAGE_PADDING} from "@cropbook/shared/constants";
+import type {MetaDataType, RawMetaDataType} from "@cropbook/shared/types";
+import {A4_HEIGHT, A4_WIDTH} from "@cropbook/shared/constants";
 import "./BookPage.css";
 import BookPagesPagination from "../../components/BookPagesPagination";
 
@@ -91,6 +91,69 @@ const BookPage = () => {
         );
     };
 
+    const handleAdditionalFieldChange = (
+        index: number,
+        field: keyof RawMetaDataType,
+        value: string,
+    ) => {
+        setPageMetadata((items) =>
+            items.map((item, idx) =>
+                idx !== index
+                    ? item
+                    : {
+                        ...item,
+                        value: {
+                            ...item.value,
+                            additional: {
+                                ...(item.value.additional ?? {
+                                    page: item.value.page ?? page,
+                                    top: 0,
+                                    left: 0,
+                                    right: A4_WIDTH,
+                                    bottom: A4_HEIGHT,
+                                }),
+                                [field]: Number(value),
+                            },
+                        },
+                    },
+            ),
+        );
+    };
+
+    const addAdditional = (index: number) => {
+        setPageMetadata((items) =>
+            items.map((item, idx) =>
+                idx !== index
+                    ? item
+                    : {
+                        ...item,
+                        value: {
+                            ...item.value,
+                            additional: {
+                                page: item.value.page ?? page,
+                                top: 0,
+                                left: 0,
+                                right: A4_WIDTH,
+                                bottom: A4_HEIGHT,
+                            },
+                        },
+                    },
+            ),
+        );
+    };
+
+    const deleteAdditional = (index: number) => {
+        setPageMetadata((items) =>
+            items.map((item, idx) => {
+                if (idx !== index) return item;
+
+                delete item.value.additional;
+
+                return item;
+            }),
+        );
+    };
+
     const handleSave = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!bookName || !pageNumber || !selectedMask) return;
@@ -134,8 +197,17 @@ const BookPage = () => {
 
     const metadataList = pageMetadata.length ? (
         pageMetadata.map((item, index) => (
-            <div className="metadata-item" key={`${item.key}-${index}`}>
+            <div className={`metadata-item ${item.value.additional && 'has-extra'}`} key={`${item.key}-${index}`}>
                 <div className="metadata-item-key">{item.key}</div>
+                {!item.value.additional && (
+                    <button
+                        type="button"
+                        className="additional book-button"
+                        onClick={() => addAdditional(index)}
+                    >
+                        Add
+                    </button>
+                )}
                 <label className="metadata-item-top">
                     <span>Top: <span className="min-max">{0}</span></span>
                     <input
@@ -184,6 +256,81 @@ const BookPage = () => {
                         }
                     />
                 </label>
+                {item.value.additional && (
+                    <>
+                        <label className="metadata-additional-item-page"><span>Page: <span className="min-max">{0}</span></span>
+                            <input
+                                type="number"
+                                value={item.value.additional.page}
+                                onChange={(event) =>
+                                    handleAdditionalFieldChange(index, "page", event.target.value)
+                                }
+                            />
+                        </label>
+                        <button
+                            type="button"
+                            className="additional-delete book-button"
+                            onClick={() => deleteAdditional(index)}
+                        >
+                            Delete
+                        </button>
+                        <label className="metadata-additional-item-top"><span>Top: <span className="min-max">{0}</span></span>
+                            <input
+                                type="number"
+                                min={0}
+                                max={A4_HEIGHT - 1}
+                                value={item.value.additional.top}
+                                onChange={(event) =>
+                                    handleAdditionalFieldChange(index, "top", event.target.value)
+                                }
+                            />
+                        </label>
+                        <label className="metadata-additional-item-left">
+                            <span>Left: <span className="min-max">{0}</span></span>
+                            <input
+                                type="number"
+                                min={0}
+                                max={A4_WIDTH - 1}
+                                value={item.value.additional.left}
+                                onChange={(event) =>
+                                    handleAdditionalFieldChange(index, "left", event.target.value)
+                                }
+                            />
+                        </label>
+                        <label className="metadata-additional-item-right">
+                            <span>Right: <span className="min-max">{A4_WIDTH}</span></span>
+                            <input
+                                type="number"
+                                min={1}
+                                max={A4_WIDTH}
+                                value={item.value.additional.right}
+                                onChange={(event) =>
+                                    handleAdditionalFieldChange(
+                                        index,
+                                        "right",
+                                        event.target.value,
+                                    )
+                                }
+                            />
+                        </label>
+                        <label className="metadata-additional-item-bottom">
+                            <span>Bottom: <span className="min-max">{A4_HEIGHT}</span></span>
+                            <input
+                                type="number"
+                                min={1}
+                                max={A4_HEIGHT}
+                                value={item.value.additional.bottom}
+                                onChange={(event) =>
+                                    handleAdditionalFieldChange(
+                                        index,
+                                        "bottom",
+                                        event.target.value,
+                                    )
+                                }
+                            />
+                        </label>
+                    </>
+                )}
             </div>
         ))
     ) : (
@@ -232,9 +379,7 @@ const BookPage = () => {
             <div className="page-metadata-panel">
                 <form onSubmit={handleSave}>
                     <div className="mask-selector">
-                        <label htmlFor="mask">
-                            Mask
-                        </label>
+                        <label htmlFor="mask">Mask</label>
                         <select
                             name="mask"
                             value={selectedMask}
@@ -263,15 +408,13 @@ const BookPage = () => {
                     {loading ? (
                         <p className="small-note">Loading metadata…</p>
                     ) : (
-                        <div className="metadata-grid">
-                            {metadataList}
-                        </div>
+                        <div className="metadata-grid">{metadataList}</div>
                     )}
 
                     <div className="page-action-row">
-                        <span className="small-note">
-                          Updates page metadata and refreshes the generated sheet.
-                        </span>
+            <span className="small-note">
+              Updates page metadata and refreshes the generated sheet.
+            </span>
                         <button
                             className="book-button"
                             type="submit"

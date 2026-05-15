@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import sharp from 'sharp';
 import path from 'node:path';
-import { MetaDataType } from '@cropbook/shared/types';
+import type  { MetaDataType, RawMetaDataType } from '@cropbook/shared/types';
 import {
   A4_HEIGHT,
   A4_WIDTH,
@@ -18,10 +18,12 @@ type CropResult = {
   height: number;
 };
 
-type BookRecord = {
-  name: string;
-  pages: number;
-} | undefined;
+type BookRecord =
+  | {
+      name: string;
+      pages: number;
+    }
+  | undefined;
 
 @Injectable()
 export class SheetService {
@@ -77,12 +79,7 @@ export class SheetService {
   }
 
   async createA4Pages(options: CreatePagesOptions): Promise<Buffer | string> {
-    const {
-      bookName,
-      regexp,
-      pages,
-      returnBuffer = false,
-    } = options;
+    const { bookName, regexp, pages, returnBuffer = false } = options;
     const normalizedBookName = this.normalizeBookName(
       decodeURIComponent(bookName),
     );
@@ -97,8 +94,8 @@ export class SheetService {
       regexp,
     );
     const targetPages: number[] = parsePages(pages ?? `1-${bookRecord.pages}`);
-    const metaDataItems = Object.values(metaData).filter(
-      (data) => targetPages.includes(data.page)
+    const metaDataItems = Object.values(metaData).filter((data) =>
+      targetPages.includes(data.page),
     );
 
     const crops = await this.cropAll(bookRecord, metaDataItems);
@@ -124,7 +121,51 @@ export class SheetService {
     bookRecord: BookRecord,
     items: MetaDataType[],
   ): Promise<CropResult[]> {
-    return Promise.all(items.map((item) => this.cropSingle(bookRecord, item)));
+    const promises: Promise<CropResult>[] = [];
+
+    for (const item of items) {
+      // main crop
+      promises.push(this.cropSingle(bookRecord, item));
+
+      // additional crop if present
+      if (item.additional) {
+        promises.push(this.cropRect(bookRecord, item.additional));
+      }
+    }
+
+    return Promise.all(promises);
+  }
+
+  private async cropRect(
+    bookRecord: BookRecord,
+    rect: RawMetaDataType,
+  ): Promise<CropResult> {
+    const pageName = `page-${String(rect.page).padStart(bookRecord?.pages.toString().length ?? 0, '0')}.png`;
+
+    const pagePath = path.join(
+      this.storagePath,
+      bookRecord?.name ?? '',
+      pageName,
+    );
+
+    const width = rect.right - rect.left;
+    const height = rect.bottom - rect.top;
+
+    const buffer = await sharp(pagePath)
+      .extract({
+        left: Math.round(rect.left),
+        top: Math.round(rect.top),
+        width: Math.round(width),
+        height: Math.round(height),
+      })
+      .png()
+      .toBuffer();
+
+    return {
+      buffer,
+      width,
+      height,
+    };
   }
 
   private async cropSingle(

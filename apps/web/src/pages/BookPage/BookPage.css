@@ -108,12 +108,13 @@
 .metadata-item {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(3, minmax(0px, 80px));
     padding: 12px;
     border: 1px solid #e8e8e8;
     border-radius: 8px;
     background: #fafafa;
     grid-template-areas:
-    "key key top top top . ."
+    "key key top top top a-button a-button"
     "left left left . right right right"
     ". . bottom bottom bottom . .";
 
@@ -121,6 +122,18 @@
         max-width: 80px;
         text-align: center;
     }
+}
+
+.metadata-item.has-extra {
+    grid-template-rows: repeat(7, minmax(0px, 80px));
+    grid-template-areas:
+    "key key top top top a-button a-button"
+    "left left left . right right right"
+    ". . bottom bottom bottom . ."
+    "a-page a-page a-page . a-delete a-delete a-delete"
+    ". . a-top a-top a-top . ."
+    "a-left a-left a-left . a-right a-right a-right"
+    ". . a-bottom a-bottom a-bottom . .";
 }
 
 .min-max {
@@ -152,6 +165,26 @@
 
 .metadata-item-bottom {
     grid-area: bottom;
+}
+
+.metadata-additional-item-page {
+    grid-area: a-page;
+}
+
+.metadata-additional-item-top {
+    grid-area: a-top;
+}
+
+.metadata-additional-item-left {
+    grid-area: a-left;
+}
+
+.metadata-additional-item-right {
+    grid-area: a-right;
+}
+
+.metadata-additional-item-bottom {
+    grid-area: a-bottom;
 }
 
 .metadata-item label {
@@ -195,6 +228,31 @@
 .book-button:disabled {
     opacity: 0.55;
     cursor: not-allowed;
+}
+
+.additional.book-button {
+    padding: 6px;
+    grid-area: a-button;
+    justify-self: end;
+    font-size: 60%;
+    color: darkgray;
+    background: white;
+    border: solid 1px lightgray;
+    width: 60px;
+    height: 28px;
+}
+
+.additional-delete.book-button {
+    margin-bottom: 4px;
+    padding: 6px;
+    grid-area: a-delete;
+    justify-self: end;
+    align-self: end;
+    color: red;
+    background: white;
+    border: solid 1px red;
+    width: 108px;
+    height: 44px;
 }
 
 .small-note {

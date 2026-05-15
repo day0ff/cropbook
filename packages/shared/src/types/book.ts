@@ -19,12 +19,16 @@ export interface BookSummary {
   iconUrl?: string;
 }
 
-export interface MetaDataType {
+export type RawMetaDataType ={
   page: number;
   top: number;
   left: number;
   right: number;
   bottom: number;
+}
+
+export type MetaDataType = RawMetaDataType & {
+  additional?: RawMetaDataType
 }
 
 export interface PageMetadataItem {
