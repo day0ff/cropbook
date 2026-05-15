@@ -1,6 +1,6 @@
 import "./BooksList.css";
 import {useEffect, useState} from "react";
-import type {BookSummary} from "@cropbook/shared";
+import type {BookSummary} from "@cropbook/shared/types";
 import {Link} from "react-router";
 
 const API_URL = import.meta.env.VITE_API_URL;

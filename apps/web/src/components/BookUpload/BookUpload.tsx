@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import type { BookDetail } from "@cropbook/shared";
+import type { BookDetail } from "@cropbook/shared/types";
 import "./BookUpload.css";
 
 const API_URL = import.meta.env.VITE_API_URL;

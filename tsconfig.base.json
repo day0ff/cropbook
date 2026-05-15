@@ -2,13 +2,14 @@
   "compilerOptions": {
     "target": "ES2023",
     "module": "CommonJS",
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "paths": {
-      "@cropbook/shared/types": [
-        "packages/shared/src/types/index.ts"
-      ]
+      "@cropbook/shared/constants": ["packages/shared/src/constants/index.ts"],
+      "@cropbook/shared/types": ["packages/shared/src/types/index.ts"]
     }
   }
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import type { BookDetail } from "@cropbook/shared";
+import type { BookDetail } from "@cropbook/shared/types";
 import "./Book.css";
 import BookMasks from "../../components/BookMasks";
 import BookCrop from "../../components/BookCrop";

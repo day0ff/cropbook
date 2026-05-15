@@ -1,5 +1,5 @@
 import {type FC, useEffect, useState} from "react";
-import type {BookDetail} from "@cropbook/shared";
+import type {BookDetail} from "@cropbook/shared/types";
 import BookMask from "./components/BookMask";
 import "./BookMasks.css";
 

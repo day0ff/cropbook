@@ -1,11 +1,9 @@
 import {useEffect, useMemo, useState, type FormEvent} from "react";
 import {Link, useParams} from "react-router";
 import type {MetaDataType} from "@cropbook/shared/types";
-import {A4_HEIGHT, A4_WIDTH} from "@cropbook/shared/constants";
+import {A4_HEIGHT, A4_WIDTH, PAGE_PADDING} from "@cropbook/shared/constants";
 import "./BookPage.css";
 import BookPagesPagination from "../../components/BookPagesPagination";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 type PageMetadataItem = {
     key: string;
@@ -16,6 +14,8 @@ type PageMetadataResponse = {
     masks: string[];
     metadataByMask: Record<string, Array<PageMetadataItem>>;
 };
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const BookPage = () => {
     const {bookName, pageNumber} = useParams();
@@ -137,7 +137,7 @@ const BookPage = () => {
             <div className="metadata-item" key={`${item.key}-${index}`}>
                 <div className="metadata-item-key">{item.key}</div>
                 <label className="metadata-item-top">
-                    Top
+                    <span>Top: <span className="min-max">{0}</span></span>
                     <input
                         type="number"
                         min={0}
@@ -149,7 +149,7 @@ const BookPage = () => {
                     />
                 </label>
                 <label className="metadata-item-left">
-                    Left
+                    <span>Left: <span className="min-max">{0}</span></span>
                     <input
                         type="number"
                         min={0}
@@ -161,7 +161,7 @@ const BookPage = () => {
                     />
                 </label>
                 <label className="metadata-item-right">
-                    Right
+                    <span>Right: <span className="min-max">{A4_WIDTH}</span></span>
                     <input
                         type="number"
                         min={1}
@@ -173,7 +173,7 @@ const BookPage = () => {
                     />
                 </label>
                 <label className="metadata-item-bottom">
-                    Bottom
+                    <span>Bottom: <span className="min-max">{A4_HEIGHT}</span></span>
                     <input
                         type="number"
                         min={1}
@@ -247,7 +247,15 @@ const BookPage = () => {
                                 </option>
                             ))}
                         </select>
-
+                        <button
+                            className="book-button"
+                            type="submit"
+                            disabled={
+                                saving || loading || !selectedMask || !pageMetadata.length
+                            }
+                        >
+                            {saving ? "Saving..." : "Save"}
+                        </button>
                     </div>
 
                     {error ? <p className="page-error">{error}</p> : null}
@@ -261,6 +269,9 @@ const BookPage = () => {
                     )}
 
                     <div className="page-action-row">
+                        <span className="small-note">
+                          Updates page metadata and refreshes the generated sheet.
+                        </span>
                         <button
                             className="book-button"
                             type="submit"
@@ -270,9 +281,6 @@ const BookPage = () => {
                         >
                             {saving ? "Saving..." : "Save"}
                         </button>
-                        <span className="small-note">
-                          Updates page metadata and refreshes the generated sheet.
-                        </span>
                     </div>
                 </form>
             </div>

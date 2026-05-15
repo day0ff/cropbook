@@ -1,5 +1,5 @@
 import {type FC, useEffect, useState} from "react";
-import type {ProcessingType} from "@cropbook/shared";
+import type {ProcessingType} from "@cropbook/shared/types";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
