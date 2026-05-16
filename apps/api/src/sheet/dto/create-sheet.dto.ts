@@ -1,12 +1,15 @@
 import {
   ArrayMinSize,
   IsArray,
+  IsBoolean,
+  IsOptional,
   IsString,
 } from 'class-validator';
 
 export class CreateSheetDto {
+  @IsOptional()
   @IsString()
-  outputFileName!: string;
+  outputFileName?: string;
 
   @IsString()
   mask!: string;
@@ -14,4 +17,8 @@ export class CreateSheetDto {
   @IsArray()
   @ArrayMinSize(1)
   items!: string[];
+
+  @IsOptional()
+  @IsBoolean()
+  returnBuffer?: boolean;
 }

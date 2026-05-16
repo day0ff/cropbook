@@ -1,6 +1,6 @@
 .book-pages {
   display: flex;
-  margin-top: 20px;
+  margin: 20px 0;
   gap: 0.75rem;
   align-items: center;
   justify-content: center;

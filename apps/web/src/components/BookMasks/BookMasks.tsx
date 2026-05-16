@@ -38,7 +38,6 @@ const BookMasks: FC<{ bookName: string | undefined }> = ({bookName = ''}) => {
             ) : (
                 <BookMask bookName={bookName} pageCount={100} mask={'\\d+\\.\\d+\\.'}/>
             )}
-            <hr/>
         </div>
     );
 }

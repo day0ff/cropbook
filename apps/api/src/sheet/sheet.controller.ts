@@ -38,6 +38,24 @@ export class SheetController {
     res.send(buffer);
   }
 
+  @Post(':bookName/sheet/preview')
+  async previewSheet(
+    @Param('bookName') bookName: string,
+    @Body() body: CreateSheetDto,
+  ) {
+    const { pageNumbers, buffer } = await this.imageSheetService.getSheetPages({
+      bookName,
+      regexp: body.mask,
+      items: body.items,
+      returnBuffer: body.returnBuffer,
+    });
+
+    return {
+      pages: pageNumbers,
+      buffer: buffer ? buffer.toString('base64') : undefined,
+    };
+  }
+
   @Post(':bookName/pages/download')
   async downloadPages(
     @Param('bookName') bookName: string,

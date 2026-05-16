@@ -5,10 +5,14 @@ import type {BookDetail} from "@cropbook/shared/types";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const BookPages: FC<{ bookName?: string; }> = ({bookName,}) => {
-    const [inputValue, setInputValue] = useState("1");
+const BookPages: FC<{ bookName?: string; page?: string}> = ({bookName, page = '1'}) => {
+    const [inputValue, setInputValue] = useState(page);
     const [book, setBook] = useState<BookDetail>();
     const pageCount = book?.pageCount ?? 1;
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
+    };
 
     useEffect(() => {
         if (!bookName) return;
@@ -18,9 +22,11 @@ const BookPages: FC<{ bookName?: string; }> = ({bookName,}) => {
             .then((items) => setBook(items));
     }, [bookName]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value);
-    };
+    useEffect(() => {
+        if (inputValue === page) return
+
+        setInputValue(page);
+    }, [page]);
 
     return (
         <div className="book-pages">

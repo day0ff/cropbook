@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import sharp from 'sharp';
 import path from 'node:path';
-import type  { MetaDataType, RawMetaDataType } from '@cropbook/shared/types';
+import type { MetaDataType, RawMetaDataType } from '@cropbook/shared/types';
 import {
   A4_HEIGHT,
   A4_WIDTH,
@@ -55,6 +55,11 @@ export class SheetService {
       decodeURIComponent(bookName),
     );
     const bookRecord = await this.booksDb.getBook(normalizedBookName);
+
+    if (!bookRecord) {
+      throw new NotFoundException(`Book not found: ${normalizedBookName}`);
+    }
+
     const metaData = await this.booksDb.getMetadataByMask(
       normalizedBookName,
       regexp,
@@ -76,6 +81,49 @@ export class SheetService {
     // await fs.writeFile(outputPath, resultBuffer);
 
     return outputPath;
+  }
+
+  async getSheetPages(options: CreateSheetOptions): Promise<{
+    pageNumbers: number[];
+    buffer?: Buffer;
+  }> {
+    const { bookName, regexp, items, returnBuffer = false } = options;
+    const normalizedBookName = this.normalizeBookName(
+      decodeURIComponent(bookName),
+    );
+    const bookRecord = await this.booksDb.getBook(normalizedBookName);
+
+    if (!bookRecord) {
+      throw new NotFoundException(`Book not found: ${normalizedBookName}`);
+    }
+
+    const metaData = await this.booksDb.getMetadataByMask(
+      normalizedBookName,
+      regexp,
+    );
+    const metaDataItems = items
+      .map((item) => metaData[item])
+      .filter((item): item is MetaDataType => !!item);
+
+    const pageNumbers = Array.from(
+      new Set(
+        metaDataItems.flatMap((item) => [
+          item.page,
+          ...(item.additional ? [item.additional.page] : []),
+        ]),
+      ),
+    ).sort((a, b) => a - b);
+
+    const result: { pageNumbers: number[]; buffer?: Buffer } = {
+      pageNumbers,
+    };
+
+    if (returnBuffer) {
+      const crops = await this.cropAll(bookRecord, metaDataItems);
+      result.buffer = await this.composeA4(crops);
+    }
+
+    return result;
   }
 
   async createA4Pages(options: CreatePagesOptions): Promise<Buffer | string> {

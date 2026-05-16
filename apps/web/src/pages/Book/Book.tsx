@@ -4,7 +4,6 @@ import type { BookDetail } from "@cropbook/shared/types";
 import "./Book.css";
 import BookMasks from "../../components/BookMasks";
 import BookCrop from "../../components/BookCrop";
-import BookPages from "../../components/BookPages";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -33,7 +32,6 @@ const Book = () => {
       </h1>
       <BookCrop bookName={bookName} />
       <BookMasks bookName={bookName} />
-      <BookPages bookName={book?.bookName} />
     </div>
   );
 };
