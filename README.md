@@ -2,6 +2,8 @@
 
 **CropBook** is an intelligent system designed to automatically "crop" and extract specific segments from books based on your textual descriptions. Whether you need to find all mentions of a specific event, extract character descriptions, or gather thematic snippets, CropBook does the heavy lifting for you.
 
+⚠️ Note: This repository is experimental. It was created and edited with the assistance of AI coding agents (GitHub Copilot).
+
 ## 🌟 Features
 
 *   **Multi-Format Support:** Upload digital copies of books in various formats (PDF, EPUB, TXT, etc.).
@@ -14,7 +16,7 @@
 *   **Runtime:** Node.js
 *   **Package Manager:** pnpm
 *   **NLP/LLM:** LangChain.js / OpenAI SDK / Transformers.js
-*   **OCR:** Tesseract.js / PDF-parse
+*   **OCR:** paddle/ paddleocr / PDF-parse
 *   **Language:** TypeScript (optional, but recommended)
 
 ## 🚀 Installation

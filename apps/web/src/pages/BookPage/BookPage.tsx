@@ -64,7 +64,7 @@ const BookPage = () => {
     const handleFieldChange = (
         index: number,
         field: keyof MetaDataType,
-        value: string,
+        value: string | boolean,
     ) => {
         setPageMetadata((items) =>
             items.map((item, idx) =>
@@ -74,7 +74,7 @@ const BookPage = () => {
                         ...item,
                         value: {
                             ...item.value,
-                            [field]: Number(value),
+                            [field]: field === 'isVerified'? value : Number(value),
                         },
                     },
             ),
@@ -189,15 +189,15 @@ const BookPage = () => {
         pageMetadata.map((item, index) => (
             <div className={`metadata-item ${item.value.additional && 'has-extra'}`} key={`${item.key}-${index}`}>
                 <div className="metadata-item-key">{item.key}</div>
-                {!item.value.additional && (
-                    <button
-                        type="button"
-                        className="additional book-button"
-                        onClick={() => addAdditional(index)}
-                    >
-                        Add
-                    </button>
-                )}
+                <input
+                    className="metadata-item-verified"
+                    type="checkbox"
+                    title={item.value.isVerified ? "verified" : "not verified"}
+                    checked={item.value.isVerified}
+                    onChange={(event) =>
+                        handleFieldChange(index, "isVerified", event.target.checked)
+                    }
+                />
                 <label className="metadata-item-top">
                     <span>Top: <span className="min-max">{0}</span></span>
                     <input
@@ -246,9 +246,20 @@ const BookPage = () => {
                         }
                     />
                 </label>
+                <hr className={"metadata-item-hr"}/>
+                {!item.value.additional && (
+                    <button
+                        type="button"
+                        className="additional book-button"
+                        onClick={() => addAdditional(index)}
+                    >
+                        Add
+                    </button>
+                )}
                 {item.value.additional && (
                     <>
-                        <label className="metadata-additional-item-page"><span>Page: <span className="min-max">{0}</span></span>
+                        <label className="metadata-additional-item-page"><span>Page: <span
+                            className="min-max">{0}</span></span>
                             <input
                                 type="number"
                                 value={item.value.additional.page}

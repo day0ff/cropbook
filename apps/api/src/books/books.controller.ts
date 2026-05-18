@@ -100,6 +100,23 @@ export class BooksController {
     return this.booksService.getBook(bookName);
   }
 
+  @Get(':bookName/metadata/:mask')
+  async getMetadataByMask(
+    @Param('bookName') bookName: string,
+    @Param('mask') mask: string,
+  ): Promise<Array<{ key: string; value: MetaDataType }>> {
+    const normalizedBookName = this.booksService.normalizeBookName(bookName);
+    const metadata = await this.booksDb.getMetadataByMask(
+      normalizedBookName,
+      mask,
+    );
+
+    return Object.entries(metadata).map(([key, value]) => ({
+      key,
+      value,
+    }));
+  }
+
   @Get(':bookName/pages/:pageNumber/metadata')
   async getPageMetadata(
     @Param('bookName') bookName: string,

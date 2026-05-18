@@ -25,6 +25,8 @@ export type RawMetaDataType ={
   left: number;
   right: number;
   bottom: number;
+  isCompleted?: boolean;
+  isVerified?: boolean;
 }
 
 export type MetaDataType = RawMetaDataType & {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BooksDbService } from '../books/books-db.service';
 import { BooksService } from '../books/books.service';
-import type { TaskType } from '@cropbook/shared/types';
+import type { TaskType, MetaDataType } from '@cropbook/shared/types';
 
 @Injectable()
 export class SchemasService {
@@ -52,7 +52,35 @@ export class SchemasService {
     patch: Partial<Omit<TaskType, 'orderNumber'>>,
   ) {
     const normalized = this.booksService.normalizeBookName(bookName);
-    return this.booksDb.updateTask(normalized, mask, orderNumber, patch);
+    const updated = await this.booksDb.updateTask(
+      normalized,
+      mask,
+      orderNumber,
+      patch,
+    );
+
+    // Reflect isCompleted/isVerified changes in metadata entries for all
+    // exercises referenced by the task.
+    try {
+      const metadata = await this.booksDb.getMetadataByMask(normalized, mask);
+
+      for (const key of updated.exercise) {
+        const existing = metadata[key];
+        if (!existing) continue;
+
+        const updatedMeta: MetaDataType = {
+          ...existing,
+          isCompleted: updated.isCompleted,
+          isVerified: updated.isVerified,
+        };
+
+        await this.booksDb.saveMetadata(normalized, mask, key, updatedMeta);
+      }
+    } catch (err) {
+      // If metadata update fails, don't block the main task update.
+    }
+
+    return updated;
   }
 
   async deleteTask(bookName: string, mask: string, orderNumber: number) {

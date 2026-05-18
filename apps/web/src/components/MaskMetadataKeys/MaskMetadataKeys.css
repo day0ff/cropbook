@@ -1,0 +1,81 @@
+.mask-metadata-keys {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.mask-metadata-keys-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.mask-metadata-keys-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.75rem;
+  cursor: pointer;
+}
+
+.mask-metadata-keys-toggle:hover {
+  background: #e5e7eb;
+}
+
+.mask-metadata-keys-toggle-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.mask-metadata-keys-body {
+  padding: 0.75rem 0.85rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+}
+
+.mask-metadata-keys-status {
+  font-size: 0.88rem;
+  color: #4b5563;
+}
+
+.mask-metadata-keys-error {
+  color: #b91c1c;
+}
+
+.mask-metadata-keys-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mask-metadata-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.mask-metadata-pill--verified {
+  background-color: #8b5cf6;
+}
+
+.mask-metadata-pill--completed {
+  background-color: #16a34a;
+}
+
+.mask-metadata-pill--default {
+  background-color: #6b7280;
+}
