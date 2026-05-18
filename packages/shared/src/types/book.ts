@@ -46,3 +46,17 @@ export interface BookUploadProgress {
   totalPages: number;
   currentPage: number;
 }
+
+type BookName = string;
+type Mask = string;
+type Exercise = string;
+export type TaskType = {
+  isCompleted: boolean;
+  isVerified: boolean;
+  orderNumber: number;
+  exercise: Array<Exercise>;
+  date?: Date;
+  notes?: string;
+}
+
+export type SchemasType = Record<BookName, Record<Mask, Array<TaskType>>>

@@ -17,6 +17,13 @@
   & form {
     margin: 10px 0;
   }
+  & .book-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
 
   & .book-page-links {
     margin-top: 20px;

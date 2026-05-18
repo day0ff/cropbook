@@ -1,19 +1,9 @@
 import {useEffect, useMemo, useState, type FormEvent} from "react";
 import {Link, useParams} from "react-router";
-import type {MetaDataType, RawMetaDataType} from "@cropbook/shared/types";
+import type {MetaDataType, PageMetadataItem, PageMetadataResponse, RawMetaDataType} from "@cropbook/shared/types";
 import {A4_HEIGHT, A4_WIDTH} from "@cropbook/shared/constants";
 import "./BookPage.css";
 import BookPagesPagination from "../../components/BookPagesPagination";
-
-type PageMetadataItem = {
-    key: string;
-    value: MetaDataType;
-};
-
-type PageMetadataResponse = {
-    masks: string[];
-    metadataByMask: Record<string, Array<PageMetadataItem>>;
-};
 
 const API_URL = import.meta.env.VITE_API_URL;
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import type { BookDetail } from "@cropbook/shared/types";
 import "./Book.css";
 import BookMasks from "../../components/BookMasks";
@@ -21,15 +21,25 @@ const Book = () => {
 
   return (
     <div className="book-container">
-      <h1>
-        {book && (
-          <img
-            src={`${API_URL}/api${book.iconUrl}`}
-            alt={`${book.bookName} cover`}
-          />
-        )}
-        {bookName}
-      </h1>
+      <div className="book-header-row">
+        <h1>
+          {book && (
+            <img
+              src={`${API_URL}/api${book.iconUrl}`}
+              alt={`${book.bookName} cover`}
+            />
+          )}
+          {bookName}
+        </h1>
+        {bookName ? (
+          <Link
+            className="book-button"
+            to={`/book/${encodeURIComponent(bookName)}/tasks`}
+          >
+            Tasks
+          </Link>
+        ) : null}
+      </div>
       <BookCrop bookName={bookName} />
       <BookMasks bookName={bookName} />
     </div>

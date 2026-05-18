@@ -1,0 +1,188 @@
+.book-tasks-page {
+  max-width: 1200px;
+  width: 90vw;
+  margin: 0 auto;
+  padding: 1rem 0;
+}
+
+.book-tasks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.book-tasks-header h1 {
+  margin: 0;
+  color: #6e3f9e;
+}
+
+.book-tasks-header p {
+  margin: 0.5rem 0 0;
+  color: #4b4b63;
+}
+
+.book-tasks-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.book-tasks-toolbar {
+  margin-bottom: 1rem;
+}
+
+.book-tasks-toolbar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.book-tasks-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.book-tasks-list {
+  background: #ffffff;
+  border: 1px solid rgba(111, 63, 158, 0.12);
+  border-radius: 14px;
+  padding: 1rem;
+  width: 100%;
+}
+
+.tasks-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.tasks-table-wrapper {
+  overflow-x: auto;
+}
+
+.task-create-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(111, 63, 158, 0.12);
+  border-radius: 12px;
+  padding: 1rem;
+  background: #faf5ff;
+}
+
+.task-create-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.task-create-row--small {
+  align-items: center;
+}
+
+.task-create-form label {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.task-create-form input[type="text"],
+.task-create-form input[type="datetime-local"] {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(111, 63, 158, 0.18);
+}
+
+.task-create-form button {
+  width: fit-content;
+  min-width: 140px;
+}
+
+.tasks-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tasks-table th,
+.tasks-table td {
+  padding: 0.8rem 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.tasks-table tbody tr:hover {
+  background: rgba(102, 126, 234, 0.08);
+  cursor: pointer;
+}
+
+.tasks-table tbody tr.selected {
+  background: rgba(118, 75, 162, 0.12);
+}
+
+.link-button {
+  color: #4b2e83;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.tasks-empty,
+.tasks-loading,
+.tasks-error,
+.preview-empty {
+  padding: 1rem;
+  color: #6b6375;
+}
+
+.tasks-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.selected-task-summary {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f5f0ff;
+  border-radius: 10px;
+}
+
+/* Modal preview styles */
+.preview-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+.preview-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+.preview-modal-close {
+  background: transparent;
+  border: none;
+  color: #6e3f9e;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}

@@ -3,7 +3,12 @@ import { Low } from 'lowdb';
 import { JSONFile } from 'lowdb/node';
 import * as path from 'path';
 import { promises as fs } from 'fs';
-import { BookUploadProgress, MetaDataType } from '@cropbook/shared/types';
+import {
+  BookUploadProgress,
+  MetaDataType,
+  SchemasType,
+  TaskType,
+} from '@cropbook/shared/types';
 
 interface BookRecord {
   name: string;
@@ -14,6 +19,7 @@ interface BooksDb {
   books: BookRecord[];
   progress: Record<string, BookUploadProgress>;
   metadata: Record<string, Record<string, Record<string, MetaDataType>>>;
+  schemas: SchemasType;
 }
 
 @Injectable()
@@ -39,6 +45,7 @@ export class BooksDbService implements OnModuleInit {
       books: [],
       progress: {},
       metadata: {},
+      schemas: {},
     });
     await this.db.read();
 
@@ -47,6 +54,7 @@ export class BooksDbService implements OnModuleInit {
         books: [],
         progress: {},
         metadata: {},
+        schemas: {},
       };
     }
   }
@@ -121,9 +129,130 @@ export class BooksDbService implements OnModuleInit {
     return this.db.data.metadata[bookName] ?? {};
   }
 
-  async getBookMasks(
+  async saveSchemas(
     bookName: string,
-  ): Promise<Array<string>> {
+    mask: string,
+    items: Array<TaskType>,
+  ): Promise<void> {
+    if (!this.db) throw new Error('Database not initialized');
+
+    if (!this.db.data.schemas[bookName]) {
+      this.db.data.schemas[bookName] = {} as any;
+    }
+
+    this.db.data.schemas[bookName][mask] = items;
+    await this.db.write();
+  }
+
+  async getSchemas(
+    bookName: string,
+    mask: string,
+    page = 1,
+    limit = 20,
+  ): Promise<{ items: Array<TaskType>; total: number }> {
+    if (!this.db) throw new Error('Database not initialized');
+
+    const all = this.db.data.schemas[bookName]?.[mask] ?? [];
+    const sorted = [...all].sort((a, b) => a.orderNumber - b.orderNumber);
+    const total = sorted.length;
+    const start = (page - 1) * limit;
+    const items = sorted.slice(start, start + limit);
+    return { items, total };
+  }
+
+  async createTask(
+    bookName: string,
+    mask: string,
+    task: Omit<TaskType, 'orderNumber'>,
+  ): Promise<TaskType> {
+    if (!this.db) throw new Error('Database not initialized');
+
+    if (!this.db.data.schemas[bookName]) {
+      this.db.data.schemas[bookName] = {} as any;
+    }
+
+    if (!this.db.data.schemas[bookName][mask]) {
+      this.db.data.schemas[bookName][mask] = [] as TaskType[];
+    }
+
+    const list = this.db.data.schemas[bookName][mask];
+    const maxOrder = list.reduce(
+      (max: number, t: TaskType) => Math.max(max, t.orderNumber),
+      0,
+    );
+    const newOrder = maxOrder + 1;
+    const newTask: TaskType = {
+      orderNumber: newOrder,
+      isCompleted: task.isCompleted,
+      isVerified: task.isVerified,
+      exercise: task.exercise,
+      date: task.date,
+      notes: task.notes,
+    };
+
+    list.push(newTask);
+    await this.db.write();
+    return newTask;
+  }
+
+  async getTask(
+    bookName: string,
+    mask: string,
+    orderNumber: number,
+  ): Promise<TaskType | undefined> {
+    if (!this.db) throw new Error('Database not initialized');
+    return this.db.data.schemas[bookName]?.[mask]?.find(
+      (task) => task.orderNumber === orderNumber,
+    );
+  }
+
+  async updateTask(
+    bookName: string,
+    mask: string,
+    orderNumber: number,
+    patch: Partial<Omit<TaskType, 'orderNumber'>>,
+  ): Promise<TaskType> {
+    if (!this.db) throw new Error('Database not initialized');
+
+    const list = this.db.data.schemas[bookName]?.[mask] ?? [];
+    const idx = list.findIndex((t) => t.orderNumber === orderNumber);
+    if (idx < 0) {
+      throw new Error('Task not found');
+    }
+
+    const existing = list[idx];
+    const updated: TaskType = {
+      ...existing,
+      isCompleted: patch.isCompleted ?? existing.isCompleted,
+      isVerified: patch.isVerified ?? existing.isVerified,
+      exercise: patch.exercise ?? existing.exercise,
+      date: patch.date ?? existing.date,
+      notes: patch.notes ?? existing.notes,
+    };
+
+    list[idx] = updated;
+    await this.db.write();
+    return updated;
+  }
+
+  async deleteTask(
+    bookName: string,
+    mask: string,
+    orderNumber: number,
+  ): Promise<void> {
+    if (!this.db) throw new Error('Database not initialized');
+
+    const list = this.db.data.schemas[bookName]?.[mask] ?? [];
+    const idx = list.findIndex((task) => task.orderNumber === orderNumber);
+    if (idx < 0) {
+      throw new Error('Task not found');
+    }
+
+    list.splice(idx, 1);
+    await this.db.write();
+  }
+
+  async getBookMasks(bookName: string): Promise<Array<string>> {
     const metadata = await this.getMetadata(bookName);
 
     return Object.keys(metadata);
