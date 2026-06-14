@@ -31,7 +31,7 @@ Shared packages:
 
 # Monorepo Rules
 
-- Shared code goes to `packages/*`.
+- Shared code goes to `packages/shared/*`.
 - Apps must not directly import from each other.
 - Use workspace dependencies.
 - Prefer package-level `pnpm` scripts.

@@ -79,3 +79,17 @@
 .mask-metadata-pill--default {
   background-color: #6b7280;
 }
+
+.mask-metadata-pill--clickable {
+  border: none;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease,
+    opacity 120ms ease;
+}
+
+.mask-metadata-pill--clickable:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}

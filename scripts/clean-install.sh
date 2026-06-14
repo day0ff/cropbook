@@ -13,6 +13,6 @@ echo "Pruning pnpm store..."
 pnpm store prune
 
 echo "Reinstalling dependencies..."
-pnpm install
+pnpm install --no-frozen-lockfile
 
 echo "✅ All done!"

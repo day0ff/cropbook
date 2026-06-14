@@ -1,4 +1,5 @@
 import { type FC, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import type { MetaDataType } from "@cropbook/shared/types";
 import "./MaskMetadataKeys.css";
 
@@ -15,10 +16,23 @@ type MaskMetadataKeysProps = {
 };
 
 const MaskMetadataKeys: FC<MaskMetadataKeysProps> = ({ bookName, mask }) => {
+  const navigate = useNavigate();
   const [items, setItems] = useState<MetadataItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [collapsed, setCollapsed] = useState(true);
+
+  const handleNavigateToPage = (page: number) => {
+    if (!bookName || !Number.isFinite(page) || page <= 0) {
+      return;
+    }
+
+    navigate(
+      `/book/${encodeURIComponent(bookName)}/page/${encodeURIComponent(
+        String(page),
+      )}`,
+    );
+  };
 
   useEffect(() => {
     if (!bookName || !mask) return;
@@ -103,11 +117,26 @@ const MaskMetadataKeys: FC<MaskMetadataKeysProps> = ({ bookName, mask }) => {
             </div>
           ) : (
             <div className="mask-metadata-keys-list">
-              {items.map((item) => (
-                <span key={item.key} className={getClassName(item.value)}>
-                  {item.key}
-                </span>
-              ))}
+              {items.map((item) => {
+                const page = Number(item.value.page);
+                const isClickable = Number.isFinite(page) && page > 0;
+
+                return isClickable ? (
+                  <button
+                    key={item.key}
+                    type="button"
+                    className={`${getClassName(item.value)} mask-metadata-pill--clickable`}
+                    onClick={() => handleNavigateToPage(page)}
+                    title={`Open page ${page}`}
+                  >
+                    {item.key}
+                  </button>
+                ) : (
+                  <span key={item.key} className={getClassName(item.value)}>
+                    {item.key}
+                  </span>
+                );
+              })}
             </div>
           )}
         </div>

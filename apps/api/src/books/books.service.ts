@@ -320,7 +320,7 @@ export class BooksService {
   private normalizeBookNameImpl(name: string): string {
     const original = name.trim().replace(/\.[^.]+$/, '');
     return (
-      original.replace(/[^a-zA-Z0-9-_]/g, '_').replace(/_+/g, '_') || 'book'
+      original.replace(/[^a-zA-Z0-9-_а-яА-ЯёЁ]/g, '_').replace(/_+/g, '_') || 'book'
     );
   }
 }
